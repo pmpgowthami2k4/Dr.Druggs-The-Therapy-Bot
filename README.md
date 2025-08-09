@@ -1,4 +1,5 @@
 # 🧠 Dr.Druggs – The Therapy Bot
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4fdbfd93-5e2b-4e63-80a6-fd9d4c31807d" />
 
 ### Your AI-powered mental health companion built using Python, NLP, and web technologies.
 
