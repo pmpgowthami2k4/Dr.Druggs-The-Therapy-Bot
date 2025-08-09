@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapy Bot</title>
+
+    <!-- Bootstrap & Google Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome (Use ONLY CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="diarystyles.css">
+    
+    <style>
+        /* Dropdown styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 120px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 4px;
+        }
+        
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .show {
+            display: block;
+        }
+
+        /* Welcome Popup Styles - Adjusted dimensions */
+        .welcome-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .welcome-popup-content {
+            background-color: #FBF5E5;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 700px; /* Increased from 500px */
+            height: auto;
+            max-height: 80vh; /* Added to control height */
+            padding: 25px 35px; /* Adjusted padding */
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 2px solid #A35C7A;
+            overflow-y: auto; /* Allow scrolling if content is too tall */
+        }
+        
+        .welcome-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            color: #A35C7A;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .welcome-close-btn:hover {
+            color: #212121;
+        }
+        
+        .welcome-header {
+            color: #A35C7A;
+            font-size: 28px; /* Increased from 24px */
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .welcome-message {
+            color: #212121;
+            font-size: 16px;
+            line-height: 1.5; /* Reduced from 1.6 */
+            margin-bottom: 20px; /* Reduced from 25px */
+        }
+        
+        .welcome-message p {
+            margin-bottom: 10px; /* Reduced from 12px */
+        }
+        
+        .welcome-message ul {
+            padding-left: 20px;
+            margin-bottom: 12px; /* Reduced from 15px */
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .welcome-message li {
+            margin-bottom: 6px; /* Reduced from 8px */
+            width: 50%; /* Set to create two columns */
+            box-sizing: border-box;
+            padding-right: 10px;
+        }
+        
+        .welcome-ok-btn {
+            background-color: #C890A7;
+            color: white;
+            border: none;
+            padding: 12px 35px; /* Wider button */
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px; /* Slightly larger */
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+        
+        .welcome-ok-btn:hover {
+            background-color: #A35C7A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(163, 92, 122, 0.3);
+        }
+        
+        .welcome-ok-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            .welcome-message li {
+                width: 100%; /* Full width on small screens */
+            }
+            
+            .welcome-popup-content {
+                padding: 20px;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <button id="menu-toggle">☰</button>
+        <h2 class="navbar-title">
+            <a href="index.html" style="text-decoration: none; color: white;">Dr. Druggs : The Therapy Bot</a>
+        </h2>
+        
+        <div class="icons">
+            <button class="icon-btn"><i class="fas fa-bell"></i></button>
+            <div class="dropdown">
+                <button class="icon-btn" onclick="toggleDropdown()"><i class="fas fa-user"></i></button>
+                <div id="userDropdown" class="dropdown-content">
+                    <a href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <pip install flask-cors
+            ul class="nav flex-column">
+                <li class="nav-item"><a href="distraction.html" class="nav-link">Distraction Zone</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" onclick="showFeelGoodList()">Feel Good Lists</a></li> 
+                <li class="nav-item"><a href="therapists.html" class="nav-link">Therapist at Your Service</a></li>
+                <li><a href="http://127.0.0.1:5001" class="nav-link">Escape Cavity</a></li>
+                <li class="nav-item"><a href="dairyindex.html" class="nav-link">Dear Diary</a></li>
+                <li class="nav-item"><a href="future.html" class="nav-link">Like-Minded Community</a></li>
+                <li class="nav-item"><a href="future.html" class="nav-link">Story board</a></li>
+            </ul>
+        </div>
+    
+        <!-- Chatbot Interface -->
+        <div id="chat-container">
+            <div id="chat-box"></div>
+            <div class="input-group">
+                <input type="text" id="user-input" class="form-control" placeholder="Type a message...">
+                <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feel-Good Lists Modal -->
+    <div id="feel-good-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeFeelGoodList()">&times;</span>
+            <h2>🌟 Feel-Good Lists 🌟</h2>
+            
+            <!-- Add This Div -->
+            <div id="feel-good-content">
+                <p>Loading...</p>
+            </div>
+
+            <!-- User Customizable Lists -->
+            <div class="list-section-container">
+                <div class="list-section">
+                    <h4>📚 Favorite Novels</h4>
+                    <ul id="novel-list"></ul>
+                    <input type="text" id="novel-input" placeholder="Add a novel">
+                    <button onclick="addToList('novel')">➕ Add</button>
+                </div>
+            
+                <div class="list-section">
+                    <h4>🎬 Favorite Movies</h4>
+                    <ul id="movie-list"></ul>
+                    <input type="text" id="movie-input" placeholder="Add a movie">
+                    <button onclick="addToList('movie')">➕ Add</button>
+                </div>
+            
+                <div class="list-section">
+                    <h4>🎵 Favorite Playlists</h4>
+                    <ul id="playlist-list"></ul>
+                    <input type="text" id="playlist-input" placeholder="Add a playlist">
+                    <button onclick="addToList('playlist')">➕ Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Popup HTML -->
+    <div id="welcome-popup" class="welcome-popup">
+        <div class="welcome-popup-content">
+            <span class="welcome-close-btn">&times;</span>
+            <div id="welcome-header" class="welcome-header"></div>
+            <div id="welcome-message" class="welcome-message"></div>
+            <button id="welcome-ok-btn" class="welcome-ok-btn">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Scripts (Load at the Bottom) -->
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // User dropdown toggle function
+        function toggleDropdown() {
+            document.getElementById("userDropdown").classList.toggle("show");
+        }
+        
+        // Close the dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.icon-btn') && !event.target.matches('.fas.fa-user')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        // Welcome Popup Functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a short moment before showing popup
+            setTimeout(function() {
+                checkUserStatus();
+            }, 500);
+            
+            // Close popup when X is clicked
+            document.querySelector('.welcome-close-btn').addEventListener('click', function() {
+                document.getElementById('welcome-popup').style.display = 'none';
+            });
+            
+            // Close popup when "Got it!" button is clicked
+            document.getElementById('welcome-ok-btn').addEventListener('click', function() {
+                document.getElementById('welcome-popup').style.display = 'none';
+            });
+        });
+        
+        function checkUserStatus() {
+            const userId = localStorage.getItem('userId');
+            
+            if (!userId) {
+                // If no userId found, redirect to login page
+                window.location.href = "login.html";
+                return;
+            }
+            
+            // Check if this is the first login for this user
+            const isFirstLogin = localStorage.getItem('firstLogin_' + userId) !== 'false';
+            
+            if (isFirstLogin) {
+                // Show new user welcome
+                showNewUserWelcome();
+                // Mark user as no longer a first-time user
+                localStorage.setItem('firstLogin_' + userId, 'false');
+            } else {
+                // Show returning user welcome
+                showReturningUserWelcome();
+            }
+        }
+        
+        function showNewUserWelcome() {
+            const welcomeHeader = document.getElementById('welcome-header');
+            const welcomeMessage = document.getElementById('welcome-message');
+            
+            welcomeHeader.textContent = 'Welcome to Dr.Druggs!';
+            
+            welcomeMessage.innerHTML = `
+                <p>Thank you for joining our therapeutic community! Dr.Druggs is your personal therapy bot designed to provide support and resources for your mental wellness journey.</p>
+                
+                <p>Here's what you can explore:</p>
+                <ul>
+                    <li><strong>Chat with Dr.Druggs:</strong> Share your thoughts and feelings in the chat area.</li>
+                    <li><strong>Distraction Zone:</strong> Activities to help when you need a mental break.</li>
+                    <li><strong>Feel Good Lists:</strong> Create personalized lists of things that bring you joy.</li>
+                    <li><strong>Therapist at Your Service:</strong> Connect with professional help when needed.</li>
+                    <li><strong>Escape Cavity:</strong> A safe space when you need immediate relief.</li>
+                    <li><strong>Dear Diary:</strong> Journal your thoughts and track your progress.</li>
+                </ul>
+                
+                <p>We're here to support you on your journey to better mental health!</p>
+            `;
+            
+            document.getElementById('welcome-popup').style.display = 'flex';
+        }
+        
+        function showReturningUserWelcome() {
+            const welcomeHeader = document.getElementById('welcome-header');
+            const welcomeMessage = document.getElementById('welcome-message');
+            
+            welcomeHeader.textContent = 'Welcome Back!';
+            
+            welcomeMessage.innerHTML = `
+                <p>It's great to see you again! Dr.Druggs is here and ready to continue supporting your mental wellness journey.</p>
+                
+                <p>How are you feeling today? Remember that you can:</p>
+                <ul>
+                    <li>Chat with Dr.Druggs about your thoughts and feelings</li>
+                    <li>Visit your Dear Diary to journal your experiences</li>
+                    <li>Check your Feel Good Lists for positive reinforcement</li>
+                    <li>Use the Distraction Zone if you need a mental break</li>
+                </ul>
+                
+                <p>Your mental health matters, and we're glad you're taking time for yourself today!</p>
+            `;
+            
+            document.getElementById('welcome-popup').style.display = 'flex';
+        }
+
+        // Function definition kept in case it's used elsewhere in your code
+        function addBotMessage(message) {
+            const chatBox = document.getElementById('chat-box');
+            const botDiv = document.createElement('div');
+            botDiv.className = 'bot-message';
+            botDiv.textContent = message;
+            chatBox.appendChild(botDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Removed the automatic welcome message in chat
+    </script>
+
+</body>
+</html>

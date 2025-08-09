@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distraction Zone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #FBE8E4;">
+
+
+    <nav class="navbar">
+        <h2 class="navbar-title">Distraction Zone</h2>
+        <a href="index.html" class="btn btn-light">← Back</a>
+    </nav>
+
+    <div class="container">
+        <div class="row text-center">
+            <!-- Snake Game -->
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="snake.png" class="card-img-top" alt="Snake Game">
+                    <div class="card-body">
+                        <h5 class="card-title">Play Snake Game</h5>
+                        <p class="card-text">Classic Snake game for fun!</p>
+                        <a href="#" class="btn btn-primary" onclick="showSnakeGame()">Play Now</a>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breathing Exercise -->
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="breathing.jpeg" class="card-img-top" alt="Breathing Exercise">
+                    <div class="card-body">
+                        <h5 class="card-title">Breathing Exercise</h5>
+                        <p class="card-text">Follow along to relax.</p>
+                        <button class="btn btn-primary" onclick="showBreathingExercise()">Start</button>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Random Jokes -->
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="joke.jpeg" class="card-img-top" alt="Jokes">
+                    <div class="card-body">
+                        <h5 class="card-title">Random Jokes</h5>
+                        <p class="card-text">Laugh with a new joke every time!</p>
+                        <a href="#" class="btn btn-primary" onclick="showJokeModal()">Get Joke</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Snake Game Modal -->
+<div id="snake-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeSnakeGame()">&times;</span>
+        <h2>🐍 Snake Game</h2>
+        <canvas id="gameCanvas"></canvas>
+        <p id="game-over-text" style="display: none;">Game Over! Press any key to replay.</p>
+    </div>
+</div>
+
+
+    <!-- Breathing Exercise Modal -->
+<div id="breathing-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeBreathingExercise()">&times;</span>
+        <h2>Breathing Exercise</h2>
+        <p>Follow this simple guided breathing exercise:</p>
+        <p id="breathing-text">Inhale...</p>
+    </div>
+</div>
+
+<!-- Random Jokes Modal -->
+<div id="joke-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeJokeModal()">&times;</span>
+        <h2>😂 Random Joke</h2>
+        <p id="joke-text">Loading...</p>
+    </div>
+</div>
+
+
+    <script src="script.js"></script>
+    <script src="snake.js"></script>
+ 
+</body>
+</html>

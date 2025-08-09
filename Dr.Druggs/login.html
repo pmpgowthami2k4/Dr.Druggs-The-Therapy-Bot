@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Dr.Druggs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Gradient background - dark to light from bottom to top */
+      background: linear-gradient(to top, #A35C7A, #FBF5E5);
+      /* Add subtle pattern overlay */
+      position: relative;
+    }
+    
+    /* Add subtle pattern overlay */
+    body:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+      pointer-events: none;
+    }
+    
+    .login-container {
+      display: flex;
+      flex-direction: row-reverse;
+      max-width: 800px; /* Original size */
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(33, 33, 33, 0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .doctor-image {
+      flex: 0 0 40%;
+      background-color: #E0D0C5; /* Changed to soft peach */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .doctor-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    
+    .container {
+      flex: 0 0 60%;
+      background: white;
+      padding: 40px;
+      text-align: left;
+      border-right: 1px solid rgba(200, 144, 167, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-sizing: border-box; /* Ensure padding is included in width calculation */
+    }
+    
+    h2 {
+      margin-bottom: 25px;
+      color: #212121;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid rgba(200, 144, 167, 0.4);
+      border-radius: 8px;
+      font-size: 16px;
+      color: #212121;
+      background-color: white;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      box-sizing: border-box;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #A35C7A;
+      box-shadow: 0 0 0 2px rgba(163, 92, 122, 0.2);
+    }
+    
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    button {
+      width: 48%;
+      padding: 14px;
+      background-color: #C890A7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover {
+      background-color: #A35C7A;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(163, 92, 122, 0.2);
+    }
+    
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    
+    #status {
+      margin-top: 20px;
+      color: #A35C7A;
+      font-size: 14px;
+      word-break: break-word; /* Ensures long text wraps properly */
+    }
+    
+    .loading {
+      display: none;
+      margin-top: 15px;
+      color: #C890A7;
+    }
+    
+    .logo {
+      color: #A35C7A;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      width: 100%; /* Ensure full width */
+      white-space: nowrap; /* Prevent line breaks in logo */
+      overflow: visible; /* Make sure text doesn't get cut off */
+    }
+    
+    .welcome-text {
+      font-size: 24px;
+      color: #212121;
+      margin-bottom: 30px;
+      font-weight: 600;
+      width: 100%; /* Ensure full width */
+      white-space: nowrap; /* Prevent line breaks in welcome text */
+      overflow: visible; /* Make sure text doesn't get cut off */
+    }
+    
+    .signup-btn {
+      background-color: #FBF5E5 !important;
+      color: #A35C7A !important;
+      border: 1px solid #C890A7 !important;
+    }
+    
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column-reverse;
+        width: 95%;
+      }
+      
+      .doctor-image {
+        flex: 0 0 200px;
+      }
+      
+      .container {
+        flex: 1;
+        border-right: none;
+        padding: 30px 20px;
+      }
+      
+      .logo, .welcome-text {
+        white-space: normal; /* Allow text to wrap on small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="doctor-image">
+      <img src="doctor.png" alt="Doctor">
+    </div>
+    <div class="container">
+      <div class="logo">Dr.Druggs</div>
+      <div class="welcome-text">Welcome !!</div>
+      
+      <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        
+        <div class="button-container">
+          <button type="button" onclick="login()">Login</button>
+          <button type="button" onclick="signup()" class="signup-btn">Sign Up</button>
+        </div>
+      </form>
+      
+      <p id="loading" class="loading">Processing, please wait...</p>
+      <p id="status"></p>
+    </div>
+  </div>
+
+  <!-- Include Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+
+  <script>
+    // Firebase configuration and initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyACg9ifco1xSUUJGkYT-bwJSsXgXuyAJm8",
+      authDomain: "drdruggs-26916.firebaseapp.com",
+      projectId: "drdruggs-26916",
+      storageBucket: "drdruggs-26916.firebasestorage.app",
+      messagingSenderId: "318973415310",
+      appId: "1:318973415310:web:6da6e7f1fe206af5d69edf",
+      measurementId: "G-RF7YN9JDTY",
+      databaseURL: "https://drdruggs-26916-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // Function to show loading indicator
+    function showLoading() {
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("status").innerText = "";
+    }
+    
+    // Function to hide loading indicator
+    function hideLoading() {
+      document.getElementById("loading").style.display = "none";
+    }
+
+    // Function to send userId to Python backend
+    function sendUserIdToServer(uid) {
+      showLoading();
+      
+      return fetch("http://localhost:5000/save-user", {
+        method: "POST",
+        credentials: "include", // Important for sending/receiving cookies
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ userId: uid })
+      })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        console.log("Server response:", data);
+        hideLoading();
+        return data; // Return data for chaining
+      })
+      .catch(err => {
+        console.error("Error sending to server:", err);
+        hideLoading();
+        document.getElementById("status").innerText = "Error connecting to server: " + err.message;
+        throw err; // Re-throw to handle in calling function
+      });
+    }
+
+    // Function to check if session is working
+    function checkSession() {
+      fetch("http://localhost:5000/check-session", {
+        method: "GET",
+        credentials: "include"
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Session check:", data);
+        if (data.userId) {
+          document.getElementById("status").innerText = "Already logged in as: " + data.userId;
+        }
+      })
+      .catch(err => console.error("Session check error:", err));
+    }
+
+    // Call this when page loads to check existing session
+    checkSession();
+
+    // Login function
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      
+      if (!email || !password) {
+        document.getElementById("status").innerText = "Please enter both email and password";
+        return;
+      }
+
+      showLoading();
+      document.getElementById("status").innerText = "Logging in...";
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const uid = userCredential.user.uid;
+          localStorage.setItem("userId", uid);
+          document.getElementById("status").innerText = "Login successful! Setting up session...";
+          
+          // Send userId to backend and redirect after confirmation
+          return sendUserIdToServer(uid);
+        })
+        .then(() => {
+          // Only redirect after server confirms userId is saved
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          hideLoading();
+          document.getElementById("status").innerText = "Login failed: " + error.message;
+        });
+    }
+
+    // Signup function
+    function signup() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      
+      if (!email || !password) {
+        document.getElementById("status").innerText = "Please enter both email and password";
+        return;
+      }
+      
+      if (password.length < 6) {
+        document.getElementById("status").innerText = "Password must be at least 6 characters";
+        return;
+      }
+
+      showLoading();
+      document.getElementById("status").innerText = "Creating account...";
+
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const uid = userCredential.user.uid;
+          localStorage.setItem("userId", uid);
+          document.getElementById("status").innerText = "Signup successful! Setting up session...";
+          
+          // Send userId to backend and redirect after confirmation
+          return sendUserIdToServer(uid);
+        })
+        .then(() => {
+          // Only redirect after server confirms userId is saved
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          hideLoading();
+          document.getElementById("status").innerText = "Signup failed: " + error.message;
+        });
+    }
+
+    // Prevent form submission and handle with JavaScript instead
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      login();
+    });
+  </script>
+
+</body>
+</html>

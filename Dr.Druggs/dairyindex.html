@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dear Diary | AI Therapy Bot</title>
+  <link rel="stylesheet" href="dairystyles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* -------------------------------
+       Basic styling and layout
+    ------------------------------- */
+    header {
+      text-align: center;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .entry-card {
+      position: relative;
+      margin-bottom: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      background-color: #fff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .entry-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .entry-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .entry-delete-btn {
+      background: none;
+      border: none;
+      color: #ff6b6b;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+    .entry-delete-btn:hover {
+      background-color: rgba(255, 107, 107, 0.1);
+    }
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 8px;
+    }
+    .icon-pen { font-size: 1.2em; opacity: 0.8; }
+    .icon-menu { font-size: 1em; opacity: 0.7; }
+    .heart-icon { color: #ff6b6b; margin-left: 5px; }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 350px;
+      max-width: 90%;
+      text-align: center;
+    }
+    .modal h3 { margin-top: 0; }
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .btn-cancel { background-color: #e0e0e0; color: #333; }
+    .btn-delete { background-color: #ff6b6b; }
+    /* Entries Box */
+    .entries-box {
+      margin-top: 30px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
+    .entries-header {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .main-action {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .entry-delete-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .hidden { display: none !important; }
+    /* Image thumbnail styles */
+    .thumbnail-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .image-thumbnail {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .image-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .remove-image {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(255, 0, 0, 0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    /* Entry image styles */
+    .entry-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .entry-image {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    /* Emoji picker styles */
+    .emoji-picker {
+      position: absolute;
+      width: 300px;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      z-index: 100;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 5px;
+    }
+    .emoji-item {
+      font-size: 1.5em;
+      cursor: pointer;
+      text-align: center;
+      padding: 5px;
+      border-radius: 5px;
+      transition: background-color 0.2s;
+    }
+    .emoji-item:hover { background-color: #f0f0f0; }
+    .emoji-categories {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 5px;
+    }
+    .emoji-category {
+      cursor: pointer;
+      padding: 5px;
+      font-size: 1.2em;
+      border-radius: 5px;
+      transition: background-color 0.2s;
+    }
+    .emoji-category:hover, .emoji-category.active {
+      background-color: #f0f0f0;
+    }    /* Body styling */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #FBF5E5; /* Light cream */
+      color: #212121;           /* Dark text */
+      font-family: Arial, sans-serif;
+    }
+
+    /* Navbar container */
+    nav.navbar {
+      background-color: #FBF5E5; /* Soft pink-lavender */
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Back button */
+    nav.navbar a.btn {
+      background-color: #A35C7A; /* Deeper pink */
+      color: #FBF5E5;           /* Light text for contrast */
+      text-decoration: none;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    /* Hover effect */
+    nav.navbar a.btn:hover {
+      background-color: #212121; /* Very dark on hover */
+    }
+
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <a href="index.html" class="btn btn-light">← Back</a>
+  </nav>
+  
+
+  <div class="container">
+    <header>
+      <div class="header-logo">
+        <h1>Dear Diary</h1>
+        <div class="header-icons">
+          <i class="fas fa-pen icon-pen"></i>
+          <i class="fas fa-ellipsis-h icon-menu"></i>
+        </div>
+      </div>
+      <p>A safe space for your thoughts and feelings <i class="fas fa-heart heart-icon"></i></p>
+    </header>
+
+    <!-- Main Add Entry Button -->
+    <div class="main-action">
+      <button id="add-entry-btn" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Entry
+      </button>
+    </div>
+
+    <!-- Home View -->
+    <div id="home-view" class="view">
+      <div class="entries-box">
+        <h2 class="entries-header">My Diary Entries</h2>
+        <div id="entries-list" class="entries-grid">
+          <!-- Diary entries will be loaded here -->
+        </div>
+        <div id="no-entries-message" class="no-entries hidden">
+          <h3>No Entries Yet</h3>
+          <p>You haven't written any diary entries yet. Start by adding your first entry!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Entry Step 1 View -->
+    <div id="add-entry-step1-view" class="view hidden">
+      <button class="btn btn-back" id="back-to-home-from-add1">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </button>
+      <div class="card">
+        <h2>New Diary Entry</h2>
+        <form id="entry-details-form">
+          <div class="form-group">
+            <label for="entry-date">Date</label>
+            <input type="date" id="entry-date" required>
+          </div>
+          <div class="form-group">
+            <label for="entry-title">Title</label>
+            <input type="text" id="entry-title" placeholder="Give your entry a title..." required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Continue</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Entry Step 2 View -->
+    <div id="add-entry-step2-view" class="view hidden">
+      <button class="btn btn-back" id="back-to-step1">
+        <i class="fas fa-arrow-left"></i> Back to Details
+      </button>
+      <div class="card">
+        <h2>Write Your Thoughts</h2>
+        <form id="entry-content-form">
+          <div class="form-group">
+            <div class="textarea-header">
+              <label for="entry-content">Dear Diary,</label>
+              <div class="emoji-container">
+                <button type="button" id="emoji-picker-btn" class="btn btn-icon">
+                  <i class="fas fa-smile"></i>
+                </button>
+                <div id="emoji-picker" class="emoji-picker hidden">
+                  <div id="emoji-list">
+                    <!-- Emojis will be loaded here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <textarea id="entry-content" placeholder="Write your thoughts here..." required></textarea>
+          </div>
+          <div class="form-group">
+            <div class="image-upload-container" id="image-upload-container">
+              <div class="image-upload-area" id="image-drop-area">
+                <i class="fas fa-image"></i>
+                <p>Drag and drop an image here, or click to select</p>
+                <input type="file" id="image-upload" accept="image/*" multiple hidden>
+                <label for="image-upload" class="btn btn-outline">Select Image</label>
+              </div>
+            </div>
+            <div id="image-preview-container" class="image-preview-container">
+              <div id="thumbnail-container" class="thumbnail-container"></div>
+            </div>
+          </div>
+          <div class="button-group">
+            <button type="button" id="back-btn" class="btn btn-outline">Back</button>
+            <button type="submit" class="btn btn-primary">Save Entry</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- View Single Entry View -->
+    <div id="view-entry-view" class="view hidden">
+      <button class="btn btn-back" id="back-to-home-from-entry">
+        <i class="fas fa-arrow-left"></i> Back to Entries
+      </button>
+      <div class="card">
+        <div class="entry-header">
+          <h2 id="entry-view-title"></h2>
+          <div id="entry-view-date" class="entry-date"></div>
+          <button id="entry-view-delete" class="btn btn-outline btn-delete">
+            <i class="fas fa-trash"></i> Delete Entry
+          </button>
+        </div>
+        <div class="entry-content">
+          <div id="entry-view-content"></div>
+          <div id="entry-view-images" class="entry-images"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="image-lightbox" class="lightbox hidden">
+      <div class="lightbox-content">
+        <button id="close-lightbox" class="btn-close">
+          <i class="fas fa-times"></i>
+        </button>
+        <img id="lightbox-image" src="/placeholder.svg" alt="Enlarged image">
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal">
+      <div class="modal-content">
+        <h3>Delete Entry</h3>
+        <p>Are you sure you want to delete this diary entry? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button id="cancel-delete" class="btn btn-cancel">Cancel</button>
+          <button id="confirm-delete" class="btn btn-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  
+  <script>
+    // Initialize Firebase using your configuration (same as in your login page)
+    const firebaseConfig = {
+      apiKey: "AIzaSyACg9ifco1xSUUJGkYT-bwJSsXgXuyAJm8",
+      authDomain: "drdruggs-26916.firebaseapp.com",
+      projectId: "drdruggs-26916",
+      storageBucket: "drdruggs-26916.firebasestorage.app",
+      messagingSenderId: "318973415310",
+      appId: "1:318973415310:web:6da6e7f1fe206af5d69edf",
+      measurementId: "G-RF7YN9JDTY",
+      databaseURL: "https://drdruggs-26916-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Retrieve current user's ID from localStorage (set during login)
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("User not logged in. Please log in first.");
+      window.location.href = "login.html";
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cache DOM references
+      const addEntryBtn = document.getElementById('add-entry-btn');
+      const homeView = document.getElementById('home-view');
+      const addEntryStep1View = document.getElementById('add-entry-step1-view');
+      const addEntryStep2View = document.getElementById('add-entry-step2-view');
+      const viewEntryView = document.getElementById('view-entry-view');
+      const entriesList = document.getElementById('entries-list');
+      const noEntriesMessage = document.getElementById('no-entries-message');
+      const deleteModal = document.getElementById('delete-modal');
+      const cancelDelete = document.getElementById('cancel-delete');
+      const confirmDelete = document.getElementById('confirm-delete');
+      const entryViewDelete = document.getElementById('entry-view-delete');
+      const imageUpload = document.getElementById('image-upload');
+      const thumbnailContainer = document.getElementById('thumbnail-container');
+      const imageLightbox = document.getElementById('image-lightbox');
+      const lightboxImage = document.getElementById('lightbox-image');
+      const closeLightbox = document.getElementById('close-lightbox');
+      const emojiPickerBtn = document.getElementById('emoji-picker-btn');
+      const emojiPicker = document.getElementById('emoji-picker');
+      const emojiList = document.getElementById('emoji-list');
+      const entryContent = document.getElementById('entry-content');
+      const entryDateInput = document.getElementById('entry-date');
+
+      let currentEntryKey = null;
+      let entryToDelete = null;
+      let uploadedImages = []; // Stores base64 image URLs
+
+      // ---------- EMOJI PICKER ----------
+      const allEmojis = [
+        '😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋',
+        '😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖',
+        '😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😬','🙄','😯','😦','😧',
+        '👶','👧','🧒','👦','👩','🧑','👨','👵','🧓','👴','👮','🕵️','👷','👸','🤴','👰','🤵','👨‍👩‍👧','👨‍👩‍👧‍👦','👩‍❤️‍👨','👨‍❤️‍👨','👩‍❤️‍👩','👪','👫','👬','👭','🧍','🧎','🏃','💃','🕺','👯','🧖',
+        '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞',
+        '🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶','🌽','🥕','🧄','🧅','🥔','🍠','🥐','🥯','🍞','🥖','🥨','🧀','🥚','🍳','🧈','🥩','🍗','🍖','🦴','🌭','🍔','🍟','🍕','🥪','🥙','🧆','🌮','🌯',
+        '⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🥅','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛷','⛸','🥌','🎿','⛷','🏂','🪂','🏋️','🤼','🤸','⛹️','🤺','🤾','🏌️','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚵','🚴',
+        '⌚','📱','💻','⌨️','🖥','🖨','🖱','🖲','💽','💾','💿','📀','📼','📷','📸','📹','🎥','📞','☎️','📟','📠','📺','📻','🎙','🎚','🎛','🧭','⏱','⏲','⏰','🕰','⌛','⏳','📡','🔋','🔌','💡','🔦','🕯','🧯','🛢','💸','💵','💴','💶','💷','💰','💳','💎','⚖️',
+        '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☪️','🕉','☸️','✡️','🔯','🕎','☯️','☦️','🛐','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','🆔','⚛️'
+
+      ];
+
+      const showView = (view) => {
+        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+        view.classList.remove('hidden');
+      };
+
+      // ---------- Firebase Realtime Database FUNCTIONS ----------
+      const diaryRef = db.ref("conversations/" + userId + "/diary");
+
+      const loadEntries = () => {
+        diaryRef.orderByChild("timestamp").once('value')
+          .then(snapshot => {
+            const entries = [];
+            snapshot.forEach(childSnapshot => {
+              let entry = childSnapshot.val();
+              entry.key = childSnapshot.key;
+              entries.push(entry);
+            });
+            renderEntries(entries);
+          })
+          .catch(err => console.error("Error loading entries:", err));
+      };
+
+      const saveEntry = (entry) => {
+        // Add a timestamp field for ordering
+        entry.timestamp = Date.now();
+        diaryRef.push(entry)
+          .then(() => {
+            loadEntries();
+            showView(homeView);
+          })
+          .catch(err => console.error("Error saving entry:", err));
+      };
+
+      const deleteEntry = (entryKey) => {
+        diaryRef.child(entryKey).remove()
+          .then(() => {
+            loadEntries();
+            showView(homeView);
+          })
+          .catch(err => console.error("Error deleting entry:", err));
+      };
+
+      // ---------- ENTRY RENDERING ----------
+      const renderEntries = (entries) => {
+        entriesList.innerHTML = '';
+        if (entries.length === 0) {
+          noEntriesMessage.classList.remove('hidden');
+          return;
+        }
+        noEntriesMessage.classList.add('hidden');
+
+        // Sort entries (newest first)
+        entries.sort((a, b) => b.timestamp - a.timestamp);
+        entries.forEach(entry => {
+          const entryCard = document.createElement('div');
+          entryCard.className = 'entry-card';
+          entryCard.dataset.entryKey = entry.key;
+
+          // Delete button
+          const entryActions = document.createElement('div');
+          entryActions.className = 'entry-actions';
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'entry-delete-btn';
+          deleteBtn.dataset.entryKey = entry.key;
+          deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+          entryActions.appendChild(deleteBtn);
+          entryCard.appendChild(entryActions);
+
+          // Entry content (title, date, preview text)
+          const entryTitle = document.createElement('h3');
+          entryTitle.textContent = entry.title;
+          const entryDate = document.createElement('div');
+          entryDate.className = 'entry-date';
+          entryDate.textContent = new Date(entry.date).toLocaleDateString(undefined, {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+          });
+          const entryPreview = document.createElement('p');
+          entryPreview.className = 'entry-preview';
+          const contentPreview = entry.content.length > 100 ? entry.content.substring(0, 100) + '...' : entry.content;
+          entryPreview.textContent = contentPreview;
+          entryCard.append(entryTitle, entryDate, entryPreview);
+
+          // Image indicator if images exist
+          if (entry.images && entry.images.length) {
+            const imageIndicator = document.createElement('div');
+            imageIndicator.className = 'image-indicator';
+            imageIndicator.innerHTML = `<i class="fas fa-image"></i> ${entry.images.length} image${entry.images.length > 1 ? 's' : ''}`;
+            entryCard.appendChild(imageIndicator);
+          }
+
+          entriesList.appendChild(entryCard);
+        });
+      };
+
+      // ---------- SINGLE ENTRY VIEW ----------
+      const openEntry = (entryKey) => {
+        diaryRef.child(entryKey).once('value')
+          .then(snapshot => {
+            if (snapshot.exists()) {
+              const entry = snapshot.val();
+              currentEntryKey = entryKey;
+              document.getElementById('entry-view-title').textContent = entry.title;
+              document.getElementById('entry-view-date').textContent = new Date(entry.date).toLocaleDateString(undefined, {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+              });
+              document.getElementById('entry-view-content').innerHTML = entry.content;
+
+              const imagesContainer = document.getElementById('entry-view-images');
+              imagesContainer.innerHTML = '';
+              if (entry.images && entry.images.length) {
+                entry.images.forEach(imageData => {
+                  const img = document.createElement('img');
+                  img.src = imageData;
+                  img.alt = 'Diary image';
+                  img.className = 'entry-image';
+                  img.addEventListener('click', () => openLightbox(imageData));
+                  imagesContainer.appendChild(img);
+                });
+              }
+              showView(viewEntryView);
+            }
+          })
+          .catch(err => console.error("Error opening entry:", err));
+      };
+
+      // ---------- LIGHTBOX ----------
+      const openLightbox = (imageSrc) => {
+        lightboxImage.src = imageSrc;
+        imageLightbox.classList.remove('hidden');
+      };
+
+      // ---------- EMOJI PICKER ----------
+      const loadAllEmojis = () => {
+        emojiList.innerHTML = '';
+        allEmojis.forEach(emoji => {
+          const emojiItem = document.createElement('span');
+          emojiItem.className = 'emoji-item';
+          emojiItem.textContent = emoji;
+          emojiItem.addEventListener('click', () => insertEmoji(emoji));
+          emojiList.appendChild(emojiItem);
+        });
+      };
+
+      const toggleEmojiPicker = () => {
+        emojiPicker.classList.toggle('hidden');
+      };
+
+      const closeEmojiPickerOnClickOutside = (event) => {
+        if (!emojiPicker.contains(event.target) && event.target !== emojiPickerBtn) {
+          emojiPicker.classList.add('hidden');
+        }
+      };
+
+      const insertEmoji = (emoji) => {
+        const cursorPos = entryContent.selectionStart;
+        const textBefore = entryContent.value.substring(0, cursorPos);
+        const textAfter = entryContent.value.substring(cursorPos);
+        entryContent.value = textBefore + emoji + textAfter;
+        const newCursorPos = cursorPos + emoji.length;
+        entryContent.setSelectionRange(newCursorPos, newCursorPos);
+        entryContent.focus();
+        emojiPicker.classList.add('hidden');
+      };
+
+      const initEmojiPicker = () => { loadAllEmojis(); };
+
+      // ---------- IMAGE UPLOAD ----------
+      const handleImageUpload = (event) => {
+        const files = event.target.files;
+        Array.from(files).forEach(file => {
+          if (!file.type.match('image.*')) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const imageDataUrl = e.target.result;
+            uploadedImages.push(imageDataUrl);
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'image-thumbnail';
+            const img = document.createElement('img');
+            img.src = imageDataUrl;
+            img.alt = 'Uploaded image';
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-image';
+            removeBtn.innerHTML = '×';
+            removeBtn.addEventListener('click', () => {
+              const idx = uploadedImages.indexOf(imageDataUrl);
+              if (idx > -1) { uploadedImages.splice(idx, 1); }
+              thumbnail.remove();
+            });
+            thumbnail.append(img, removeBtn);
+            thumbnailContainer.appendChild(thumbnail);
+          };
+          reader.readAsDataURL(file);
+        });
+        event.target.value = '';
+      };
+
+      // ---------- EVENT LISTENERS ----------
+      const addEventListeners = () => {
+        // Navigation and form switching
+        addEntryBtn.addEventListener('click', () => showView(addEntryStep1View));
+        document.getElementById('back-to-home-from-add1').addEventListener('click', () => showView(homeView));
+        document.getElementById('back-to-step1').addEventListener('click', () => showView(addEntryStep1View));
+        document.getElementById('back-to-home-from-entry').addEventListener('click', () => showView(homeView));
+        document.getElementById('entry-details-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          showView(addEntryStep2View);
+        });
+        document.getElementById('back-btn').addEventListener('click', () => showView(addEntryStep1View));
+        imageUpload.addEventListener('change', handleImageUpload);
+        closeLightbox.addEventListener('click', () => imageLightbox.classList.add('hidden'));
+        imageLightbox.addEventListener('click', (e) => { if (e.target === imageLightbox) imageLightbox.classList.add('hidden'); });
+        emojiPickerBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleEmojiPicker(); });
+        document.addEventListener('click', closeEmojiPickerOnClickOutside);
+        entryDateInput.addEventListener('focus', () => emojiPicker.classList.add('hidden'));
+
+        // Save new diary entry
+        document.getElementById('entry-content-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const title = document.getElementById('entry-title').value;
+          const date = document.getElementById('entry-date').value;
+          const content = document.getElementById('entry-content').value;
+          const newEntry = { title, date, content, images: uploadedImages };
+          saveEntry(newEntry);
+          // Reset form and image thumbnails
+          document.getElementById('entry-title').value = '';
+          document.getElementById('entry-content').value = '';
+          uploadedImages = [];
+          thumbnailContainer.innerHTML = '';
+        });
+
+        // Entry card click: view or delete
+        entriesList.addEventListener('click', (event) => {
+          const deleteBtn = event.target.closest('.entry-delete-btn');
+          if (deleteBtn) {
+            event.stopPropagation();
+            entryToDelete = deleteBtn.dataset.entryKey;
+            deleteModal.style.display = 'block';
+            return;
+          }
+          const entryCard = event.target.closest('.entry-card');
+          if (entryCard) { openEntry(entryCard.dataset.entryKey); }
+        });
+
+        // Delete entry from single entry view
+        entryViewDelete.addEventListener('click', () => {
+          entryToDelete = currentEntryKey;
+          deleteModal.style.display = 'block';
+        });
+
+        // Modal actions for deletion
+        cancelDelete.addEventListener('click', () => { deleteModal.style.display = 'none'; entryToDelete = null; });
+        confirmDelete.addEventListener('click', () => {
+          if (entryToDelete) {
+            deleteEntry(entryToDelete);
+            deleteModal.style.display = 'none';
+            entryToDelete = null;
+            showView(homeView);
+          }
+        });
+
+        // Close deletion modal when clicking outside
+        window.addEventListener('click', (event) => {
+          if (event.target === deleteModal) { deleteModal.style.display = 'none'; entryToDelete = null; }
+        });
+      };
+
+      // ---------- INITIALIZATION ----------
+      const init = () => {
+        // Set today's date as default
+        entryDateInput.value = new Date().toISOString().split('T')[0];
+        loadEntries();
+        initEmojiPicker();
+        addEventListeners();
+      };
+
+      init();
+    });
+  </script>
+</body>
+</html>

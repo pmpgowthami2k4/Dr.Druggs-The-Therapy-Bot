@@ -1,0 +1,638 @@
+/* Reset default margin and padding */
+body, html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #A35C7A;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Navbar Title */
+.navbar-title {
+    color: white;
+    font-size: 30px;
+    text-align: center;
+    flex-grow: 1;
+    margin: 0;
+}
+
+/* Sidebar Toggle Button */
+#menu-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Icons */
+.icons {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Sidebar */
+#sidebar {
+    width: 250px;
+    background-color: #212121;
+    color: #FBF5E5;
+    padding: 20px;
+    position: fixed;
+    top: 60px; /* Below navbar */
+    left: -250px;
+    height: calc(100vh - 60px);
+    transition: left 0.3s ease-in-out;
+}
+
+/* Show Sidebar */
+#sidebar.active {
+    left: 0;
+}
+
+/* Sidebar Links */
+.nav-link {
+    color: #FBF5E5 !important;
+}
+.sidebar a {
+    color: white; /* Ensures all links are white */
+    text-decoration: none; /* Removes underline */
+}
+
+.sidebar a:visited {
+    color: white !important; /* Prevents different color after clicking */
+}
+
+.sidebar a:hover {
+    color: #D47FA6; /* Optional: Hover effect */
+}
+
+/* Main Chat Container */
+.container-fluid {
+    display: flex;
+    height: 100vh; /* Below navbar */
+    width: 100vw;
+    padding: 0;
+    padding-top: 60px;
+    padding-bottom: 0;
+    margin: 0;
+}
+
+/* flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0; */
+
+/* Chatbot */
+#chat-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #FBF5E5;
+    padding: 20px;
+    /* padding-bottom: 0;  Just enough padding to avoid touch */
+    width: 100%;
+    height: 100%;
+    transition: margin-left 0.3s ease-in-out; /* Smooth shift when sidebar opens */
+    justify-content: flex-end;  /* Pushes input to bottom */
+}
+
+/* Adjust chat container when sidebar is open */
+#sidebar.active + #chat-container {
+    margin-left: 250px;
+    width: calc(100vw - 250px);
+}
+
+/* Chat Box Styling */
+#chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #C890A7;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Message Container */
+.message {
+    max-width: 60%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    word-wrap: break-word;
+    font-size: 16px;
+}
+
+/* User Messages (Right Side) */
+.user-message {
+    align-self: flex-end; /* Moves user messages to the right */
+    background-color: #A35C7A;
+    color: white;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 15px;
+}
+
+/* Bot Messages (Left Side) */
+.bot-message {
+    align-self: flex-start; /* Moves bot messages to the left */
+    background-color: #FBF5E5;
+    color: #212121;
+    border-top-left-radius: 5px;
+    border-bottom-right-radius: 15px;
+}
+.chatbox {
+    display: flex;
+    flex-direction: column;}
+
+/* Input Field */
+.input-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    align-items: center;
+}
+
+/* Prevent input field from overlapping sidebar */
+/* #sidebar.active + #chat-container .input-group {
+    width: calc(100% - 150px);
+} */
+
+#sidebar.active ~ .container-fluid #chat-container .input-group {
+    width: calc(100% - 250px); /* Ensures it doesn't shrink weirdly */
+}
+
+/* Chat Input */
+.input-group input {
+    background-color: white;
+    border: 2px solid #A35C7A;
+    border-radius: 5px;
+    padding: 10px;
+    flex-grow: 1;
+}
+
+/* Send Button */
+.input-group .btn-primary {
+    background-color: #A35C7A;
+    border-color: #A35C7A;
+    border-radius: 5px;
+    padding: 10px 20px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Button Hover Effect */
+.btn-primary:hover {
+    background-color: #212121;
+    border-color: #212121;
+}
+
+
+/* ✅ Feel-Good Modal */
+#feel-good-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 60%;
+    min-height: 500px; /* Increase the height */
+    max-height: 90vh;  /* ✅ Prevents overflow */
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+/* ✅ Modal Content */
+.modal-content {
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ✅ Three-column layout for Quote, Song, and Activity */
+.feel-good-columns {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: stretch;
+    width: 100%;
+}
+
+/* ✅ Ensures equal width & proper spacing */
+.feel-good-columns .column {
+    flex: 1;
+    background: #FBF5E5;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+}
+
+/* ✅ Keeps Lists Aligned in One Row */
+.list-section-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: nowrap;  /* ✅ Keeps them side-by-side */
+    align-items: stretch;
+    margin-top: 20px;
+}
+
+/* ✅ Styling Each List Section */
+.list-section {
+    flex: 1;
+    max-width: 320px;
+    background-color: #FBF5E5;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    min-height: 180px; /* ✅ Matches the height of quote, song, and activity boxes */
+}
+
+
+/* ✅ Styling for List Items */
+.list-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-section ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin: 5px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* ✅ Ensure List Items Have Consistent Size */
+.list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 5px 0;
+    width: 100%;
+    min-height: 50px;
+}
+
+/* ✅ Ensure Text Inside List Item Doesn't Get Squished */
+.list-item span {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
+}
+
+/* ✅ Pink Add Button */
+.list-section button {
+    width: 90%;
+    margin-top: 5px;
+    background-color: #D47FA6;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.list-section button:hover {
+    background-color: #A35C7A;
+}
+
+/* ✅ Delete 'X' Button - Small and Fixed */
+/* ✅ Small Fixed Delete 'X' */
+/* ✅ Small Circular Delete Button */
+.delete-icon {
+    color: #A35C7A; /* Dark pink */
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: auto; /* Push to the right */
+    transition: 0.2s ease-in-out;
+    flex-shrink: 0; /* Prevents resizing */
+    padding: 4px;
+    border: none;
+    background: none; /* Remove any button-like appearance */
+}
+
+/* ✅ Hover effect */
+.delete-icon:hover {
+    color: #7d3d5a; /* Darker shade on hover */
+    transform: scale(1.2);
+}
+
+
+
+/* ✅ Close Button (Centered & Positioned Above the Title) */
+.close-btn {
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    background: #A35C7A;
+    color: white;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    top:-10Px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.2s ease-in-out;
+}
+
+.close-btn:hover {
+    color: #7d3d5a;
+}
+
+
+/* DISCTRACTION */
+.container {
+    margin-top: 80px;
+    background: #FBF5E5;
+    
+}
+
+.card {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card img {
+    height: 180px; /* Ensure images have a uniform height */
+    object-fit: cover;
+}
+
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+canvas {
+    background-color: #907938;
+    border: 4px solid #A35C7A;
+}
+
+
+/* BREATHING MODAL */
+/* Breathing Modal */
+#breathing-modal .modal-content {
+    text-align: center;
+    padding: 20px;
+    width: 300px;
+}
+
+#breathing-circle {
+    width: 100px;
+    height: 100px;
+    background-color: #A35C7A;
+    border-radius: 50%;
+    margin: 20px auto;
+    animation: breathing 7s infinite;
+}
+
+@keyframes breathing {
+    0%, 100% { transform: scale(1); background-color: #A35C7A; }
+    50% { transform: scale(1.5); background-color: #C890A7; }
+}
+/* Center the modal properly */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 70%;
+    transform: translate(-50%, -50%); /* Center the modal */
+    width: 350px; /* Adjust width as needed */
+    height: 300px;
+    background-color: #FBF5E5;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+
+
+#joke-modal {
+    display: none; /* Hide initially */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 350px;
+    height: 350px;
+    background-color: #FBF5E5;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+
+
+
+/* Snake Game Modal Styling */
+/* Snake Game Modal Styling */
+#snake-modal {
+    display: none; /* Hide initially */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 520px;
+    height: 520px; /* Adjusted for canvas & spacing */
+    background: #FBF5E5;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Game Canvas */
+#gameCanvas {
+    background: white;
+    display: block;
+    margin: 0 auto;
+    border: 3px solid #A35C7A;
+}
+
+/* Close Button (Top Center) */
+#snake-modal .close-btn {
+    position: absolute;
+    top: -10px; /* Move above modal */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #A35C7A;
+    color: white;
+    border: none;
+    font-size: 18px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    text-align: center;
+    line-height: 30px;
+}
+
+#snake-modal .close-btn:hover {
+    background: #7d3d5a;
+}
+
+
+/* ✅ THERAPISTS SECTION */
+.therapist-section {
+    max-width: 90%;
+    margin: 50px auto;
+    text-align: center;
+    background: #FBF5E5;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Title Styling */
+.therapist-section .section-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #A35C7A;
+}
+
+/* ✅ Scrollable Table Container */
+.therapist-table-container {
+    max-height: 600px;  /* Fixed height */
+    overflow-y: auto;   /* Enable scrolling */
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Table Styling */
+.therapist-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ Sticky Table Headers */
+.therapist-table thead {
+    position: sticky;
+    top: 0;
+    background-color: #A35C7A;
+    color: white;
+    z-index: 2;
+}
+
+/* ✅ Table Headers */
+.therapist-table th {
+    background: #A35C7A;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+}
+
+/* ✅ Table Rows */
+.therapist-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    text-align: left;
+}
+
+/* ✅ Alternate Row Color */
+.therapist-table tr:nth-child(even) {
+    background: #f8e8f0;
+}
+
+/* ✅ Button Styling */
+.therapist-table .btn {
+    background: #A35C7A;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease-in-out;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.therapist-table .btn:hover {
+    background: #7d3d5a;
+    transform: scale(1.05);
+}
+
+/* ✅ Responsive Design */
+@media (max-width: 768px) {
+    .therapist-table-container {
+        max-height: 300px;  /* Adjust height for smaller screens */
+    }
+
+    .therapist-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+

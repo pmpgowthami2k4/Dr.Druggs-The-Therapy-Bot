@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Therapy Options & Appointments</title>
+  <style>
+    body { background-color: #FBF5E5; font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    h2 { color: #A35C7A; margin-bottom: 20px; }
+    .btn { background-color: #C890A7; color: #fff; border: none; padding: 12px 24px; margin: 10px; font-size: 16px; border-radius: 6px; cursor: pointer; }
+    .btn:hover { background-color: #A35C7A; }
+    .btn-outline { background: none; border: 2px solid #C890A7; color: #A35C7A; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+    .btn-outline:hover { background: #A35C7A; color: #fff; }
+    .hidden { display: none; }
+    form { margin: 20px auto; max-width: 400px; text-align: left; background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #C890A7; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    #appointment-status { margin-top: 10px; font-weight: bold; }
+    .appointment-card { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 12px; margin: 10px auto; max-width: 400px; text-align: left; position: relative; }
+    .appointment-card button { position: absolute; top: 8px; right: 8px; background: red; color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; }
+    .slot-btn { margin: 5px; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+    .slot-available { background-color: #8BC34A; color: #fff; }
+    .slot-unavailable { background-color: #E57373; color: #fff; cursor: not-allowed; }
+    .slot-btn.selected { outline: 2px solid #333; }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div id="choose-view">
+    <button class="btn-outline" id="btn-back-main">← Back</button>
+    <h2>Choose an Option</h2>
+    <button class="btn" id="btn-chat">Chat Online</button>
+    <button class="btn" id="btn-book">Book Appointment</button>
+    <button class="btn" id="btn-view">View Appointments</button>
+  </div>
+
+  <div id="booking-view" class="hidden">
+    <button class="btn-outline" id="btn-back-book">← Back</button>
+    <h2>Book an Appointment</h2>
+    <form id="bookingForm">
+      <label for="userName">Your Name:</label>
+      <input type="text" id="userName" placeholder="Enter your name" required />
+
+      <label for="therapist">Select Therapist:</label>
+      <select id="therapist" required>
+        <option value="">-- Choose --</option>
+        <option>Dr. Getsy Solomon (PhD)</option>
+        <option>Dr. Hema Karthik (PhD)</option>
+        <option>Dr. Latha Janaki (PhD)</option>
+        <option>Ms. Ananthi</option>
+        <option>Ms. Sangareswari</option>
+        <option>Dr. Priya Kapoor</option>
+        <option>Mr. Sibi Isaiah</option>
+        <option>Mr. B. Elayaraja</option>
+        <option>Arjun Sharma, M.Sc. (Psych.)</option>
+      </select>
+
+      <label for="mode">Mode:</label>
+      <select id="mode" required>
+        <option value="">-- Choose --</option>
+        <option>In-Person</option>
+        <option>Video Call</option>
+      </select>
+
+      <label for="date">Date:</label>
+      <input type="date" id="date" required />
+
+      <label>Time Slot:</label>
+      <div id="time-slots"></div>
+      <input type="hidden" id="time" required />
+
+      <button type="submit" class="btn">Book Slot</button>
+      <p id="appointment-status"></p>
+    </form>
+  </div>
+
+  <div id="view-appointments-view" class="hidden">
+    <button class="btn-outline" id="btn-back-view">← Back</button>
+    <h2>My Appointments</h2>
+    <div id="my-appointments"></div>
+  </div>
+
+<script>
+  // --- Initialize Firebase ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyACg9ifco1xSUUJGkYT-bwJSsXgXuyAJm8",
+    authDomain: "drdruggs-26916.firebaseapp.com",
+    databaseURL: "https://drdruggs-26916-default-rtdb.firebaseio.com",
+    projectId: "drdruggs-26916",
+    storageBucket: "drdruggs-26916.firebasestorage.app",
+    messagingSenderId: "318973415310",
+    appId: "1:318973415310:web:6da6e7f1fe206af5d69edf"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // --- UI Elements ---
+  const chooseView = document.getElementById('choose-view');
+  const bookingView = document.getElementById('booking-view');
+  const viewAppointmentsView = document.getElementById('view-appointments-view');
+  const btnChat = document.getElementById('btn-chat');
+  const btnBook = document.getElementById('btn-book');
+  const btnView = document.getElementById('btn-view');
+  const btnBackMain = document.getElementById('btn-back-main');
+  const btnBackBook = document.getElementById('btn-back-book');
+  const btnBackView = document.getElementById('btn-back-view');
+  const bookingForm = document.getElementById('bookingForm');
+  const statusEl = document.getElementById('appointment-status');
+  const appointmentsDiv = document.getElementById('my-appointments');
+  const slotContainer = document.getElementById('time-slots');
+
+  // --- Auth & User Info ---
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    alert('Please login first.');
+    window.location.href = 'login.html';
+  }
+
+  // --- Utilities ---
+  function sanitizeKey(str) {
+    return str.replace(/[.#$\[\]]/g, '_');
+  }
+
+  // --- Navigation ---
+  btnBackMain.addEventListener('click', () => window.location.href = 'index.html');
+  // Redirect chat online to future.html instead of /chat
+  btnChat.addEventListener('click', () => window.location.href = 'future.html');
+  btnBook.addEventListener('click', () => {
+    chooseView.classList.add('hidden');
+    bookingView.classList.remove('hidden');
+  });
+  btnBackBook.addEventListener('click', () => {
+    bookingView.classList.add('hidden');
+    chooseView.classList.remove('hidden');
+    statusEl.textContent = '';
+    bookingForm.reset();
+    slotContainer.innerHTML = '';
+  });
+  btnView.addEventListener('click', () => {
+    chooseView.classList.add('hidden');
+    viewAppointmentsView.classList.remove('hidden');
+    loadAppointments();
+  });
+  btnBackView.addEventListener('click', () => {
+    viewAppointmentsView.classList.add('hidden');
+    chooseView.classList.remove('hidden');
+    appointmentsDiv.innerHTML = '';
+  });
+
+  // --- Load Appointments ---
+  function loadAppointments() {
+    appointmentsDiv.innerHTML = '<p>Loading...</p>';
+    db.ref(`conversations/${userId}/myappointments`).orderByChild('timestamp').once('value')
+      .then(snapshot => {
+        appointmentsDiv.innerHTML = '';
+        if (!snapshot.exists()) {
+          appointmentsDiv.innerHTML = '<p>No appointments yet.</p>';
+          return;
+        }
+        snapshot.forEach(child => {
+          const appt = child.val();
+          const card = document.createElement('div');
+          card.className = 'appointment-card';
+          card.innerHTML = `
+            <strong>${appt.userName}</strong><br>
+            <strong>${appt.date} @ ${appt.time}</strong><br>
+            ${appt.mode} with <em>${appt.therapist}</em>
+          `;
+          const del = document.createElement('button');
+          del.textContent = '×';
+          del.title = 'Delete';
+          del.onclick = () => deleteAppointment(child.key, appt);
+          card.appendChild(del);
+          appointmentsDiv.appendChild(card);
+        });
+      })
+      .catch(err => console.error('Error loading:', err));
+  }
+
+  // --- Delete Appointment ---
+  function deleteAppointment(key, appt) {
+    const tk = sanitizeKey(appt.therapist);
+    db.ref(`conversations/${userId}/myappointments/${key}`).remove();
+    db.ref(`appointments/${key}`).remove();
+    db.ref(`appointments_by_slot/${appt.date}/${appt.time}/${tk}/${appt.mode}/${key}`).remove();
+    loadAppointments();
+    statusEl.textContent = '';
+  }
+
+  // --- Slot Availability ---
+  const availableTimes = ['10:00 AM','11:00 AM','12:00 PM','2:00 PM','3:00 PM','4:00 PM'];
+  async function updateSlots() {
+    slotContainer.innerHTML = '';
+    const therapist = document.getElementById('therapist').value;
+    const date = document.getElementById('date').value;
+    const mode = document.getElementById('mode').value;
+    if (!therapist || !date || !mode) return;
+    const tk = sanitizeKey(therapist);
+    for (let time of availableTimes) {
+      const snap = await db.ref(`appointments_by_slot/${date}/${time}/${tk}/${mode}`).once('value');
+      const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+      const btn = document.createElement('button');
+      btn.textContent = time;
+      btn.className = `slot-btn ${count < 2 ? 'slot-available' : 'slot-unavailable'}`;
+      if (count < 2) {
+        btn.addEventListener('click', () => {
+          document.getElementById('time').value = time;
+          slotContainer.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        });
+      } else {
+        btn.disabled = true;
+      }
+      slotContainer.appendChild(btn);
+    }
+  }
+
+  // --- Event Listeners ---
+  document.getElementById('therapist').addEventListener('change', updateSlots);
+  document.getElementById('date').addEventListener('change', updateSlots);
+  document.getElementById('mode').addEventListener('change', updateSlots);
+  bookingForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const userName = document.getElementById('userName').value.trim();
+    const therapist = document.getElementById('therapist').value;
+    const mode = document.getElementById('mode').value;
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    if (!userName || !therapist || !date || !time) {
+      statusEl.style.color = 'red';
+      statusEl.textContent = '❌ All fields required';
+      return;
+    }
+    const tk = sanitizeKey(therapist);
+    const slotRef = db.ref(`appointments_by_slot/${date}/${time}/${tk}/${mode}`);
+    try {
+      const snap = await slotRef.once('value');
+      const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+      if (count >= 2) {
+        statusEl.style.color = 'red';
+        statusEl.textContent = '❌ Slot full for this therapist and mode';
+        return;
+      }
+      const payload = { userId, userName, therapist, mode, date, time, timestamp: firebase.database.ServerValue.TIMESTAMP };
+      const gRef = db.ref('appointments').push();
+      await gRef.set(payload);
+      await slotRef.child(gRef.key).set(true);
+      await db.ref(`conversations/${userId}/myappointments/${gRef.key}`).set(payload);
+      statusEl.style.color = 'green';
+      statusEl.textContent = '✅ Booked!';
+      bookingForm.reset();
+      slotContainer.innerHTML = '';
+    } catch (err) {
+      console.error('Booking error:', err);
+      statusEl.style.color = 'red';
+      statusEl.textContent = '❌ Booking failed';
+    }
+  });
+</script>
+</body>
+</html>
